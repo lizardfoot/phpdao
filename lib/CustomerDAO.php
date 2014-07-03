@@ -91,6 +91,7 @@ class CustomerDAO extends BaseDAO {
 	function CustomerDAO() {
 		$this->connect();
 	}
+	// creates a DTO from a DB result
 	function createDTO($row) {
 		return new CustomerDTO(
 			$row->CustomerID,
@@ -106,17 +107,21 @@ class CustomerDAO extends BaseDAO {
 			$row->Fax
 		);
 	}
+	// returns one DTO based on primary key; null if not found
+	// usage: $dto = $dao->findByPK("ALFKI");
 	function findByPK($pk) {
-		//dbgout("DAO->findByPK "); 
+		$dto = null;
 		try {
+			// tries to find the record in the cache if enabled
 			$dto = $this->memGet(new CustomerDTO($pk));
 			if($dto != null) return $dto;
 			$sth = $this->DB->prepare($this->SQL_SELECT_ONE);
-			$sth->bindParam(":CustomerID", $pk, PDO::PARAM_INT);
+			$sth->bindParam(":CustomerID", $pk, PDO::PARAM_STR);
 			$sth->execute();
 			$result = $sth->fetchAll(PDO::FETCH_OBJ);
 			foreach($result as $row) {
 				$dto = $this->createDTO($row);
+				// caches record if memcached is enabled
 				$this->memSet($dto->Key(), $dto);
 			}
 		} catch (Exception $e) {
@@ -125,8 +130,10 @@ class CustomerDAO extends BaseDAO {
 		}
 		return $dto;
 	}
+
+	// returns an array of DTOs 
+	// usage: $dtolist = $dao->search("Mexico", "order by 1 DESC", "limit 10");
 	function search($keyword = "", $sort = "", $limit = "") {
-		//dbgout("DAO->search "); 
 		$dtolist = array();
 		$sql = $this->SQL_SELECT;
 		$sql .= "WHERE ( ";
@@ -143,12 +150,10 @@ class CustomerDAO extends BaseDAO {
 		$sql .= "(Fax LIKE :keyword) ";
 		$sql .= ")";
 		$sql .= $sort . " " . $limit;
-		//dbgout($sql);
 		try {
 			$sth = $this->DB->prepare($sql);
 			$keyword = "%" . $keyword . "%";
 			$sth->bindParam(':keyword', $keyword, PDO::PARAM_STR);
-			//objout($sth);
 			$sth->execute();
 			$result = $sth->fetchAll(PDO::FETCH_OBJ);
 			foreach($result as $row) {
@@ -160,8 +165,10 @@ class CustomerDAO extends BaseDAO {
 		}
 		return $dtolist;
 	}
+	// inserts a new record and returns last insert id
+	// usage: $CustomerID = $dao->insert($dto);
+	// Note: Customer table in Northwind DB does not use autoincrement primary keys
 	function insertDTO($dto) { 
-		//dbgout("DAO->insertDTO "); 
 		try { 
 			$sth = $this->DB->prepare($this->SQL_INSERT); 
 			$sth->bindParam(":CustomerID", $dto->CustomerID, PDO::PARAM_STR, 5);	 
@@ -182,9 +189,12 @@ class CustomerDAO extends BaseDAO {
 		}		 
 		return $this->DB->lastInsertId(); 
 	} 
-	function updateDTO($dto) { 
-	//dbgout("DAO->updateDTO "); 
-		try { 
+	
+	// updates a row in the db, returns number of rows updated
+	// usage: $recordsAffected = $dao->update($dto);
+	function updateDTO($dto) { 	
+		
+		try { 			
 			$sth = $this->DB->prepare($this->SQL_UPDATE); 
 			$sth->bindParam(":CustomerID", $dto->CustomerID, PDO::PARAM_STR, 5);	 
 			$sth->bindParam(":CompanyName", $dto->CompanyName, PDO::PARAM_STR, 40);	 
@@ -198,6 +208,7 @@ class CustomerDAO extends BaseDAO {
 			$sth->bindParam(":Phone", $dto->Phone, PDO::PARAM_STR, 24);	 
 			$sth->bindParam(":Fax", $dto->Fax, PDO::PARAM_STR, 24);	 
 			$sth->execute(); 
+			// caches record if memcached is enabled
 			$this->memSet($dto->Key(), $dto); 
 		} catch (Exception $e) { 
 			objout($e); 
@@ -205,12 +216,16 @@ class CustomerDAO extends BaseDAO {
 		}		 
 		return $sth->rowCount(); 
 	} 
+
+	// delete a row in the db, returns number of rows deleted
+	// usage: $recordsDeleted = $dao->delete($dto);
 	function deleteDTO($dto) { 
-		//dbgout("DAO->deleteDTO "); 
 		try { 
 			$sth = $this->DB->prepare($this->SQL_DELETE); 
 			$sth->bindParam(':CustomerID', $dto->CustomerID, PDO::PARAM_STR);		 
-			$sth->execute(); 
+			$sth->execute(); 			
+			// removes from cache
+			$this->memDelete($dto->Key()); 
 		} catch (Exception $e) { 
 			objout($e); 
 			objout($sth->errorInfo()); 

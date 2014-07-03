@@ -47,6 +47,7 @@ class BaseDTO {
 		}					
 	}
 	
+	// returns JSON encoded text
 	function toString() {
 		return json_encode($this);
 	}
@@ -56,20 +57,16 @@ class BaseDAO {
 	var $DB = null;
 	var $MEM = null;
 	var $connect_string = "mysql:host=localhost;dbname=northwind";
-	var $_user = "apache";
-	var $_pass = "apache";
+	var $_user = "myusername";
+	var $_pass = "mypassword";
 	var $use_persistence = true;
-	var $use_cache = false;  // no memcached installed on cholmon03p
+	var $use_cache = false;  	// if memcached is installed, set to true
 	
 	function BaseDAO() {	
 		$this->connect();	
 	}
 	
-	function connect($dbname="") {
-		//dbgout("BaseDAO - connect");
-		if(strlen($dbname) > 0) {
-			$this->connect_string = "mysql:host=localhost;dbname=$dbname";
-		}
+	function connect() {
 		try {
 			if($this->use_persistence == true) {
 				$this->DB = new PDO($this->connect_string, $this->_user, $this->_pass, array(PDO::ATTR_PERSISTENT => true));
@@ -86,46 +83,36 @@ class BaseDAO {
 			}
 			
 		} catch (Exception $e) {
-			objout($e);
+			echo($e);
 		}
 	}
 	
 	// executes DML sql statements such as insert, update and delete
 	// returns number of rows affected
 	function exec($sql) {
-		//$log = $GLOBALS["LOGGER"];
-		//$log->write("BaseDAO->exec - Start: " . date("Y-m-d H:i:s")); 		
-		//$log->write("sql: $sql");
 		try {
 	    	$sth = $this->DB->prepare($sql);
 	    	$sth->execute();
 	    	return $sth->rowCount(); 
 		} catch (Exception $e) {
-			objout($e);
-			objout($sth->errorInfo());
+			echo($e);
+			echo($sth->errorInfo());
 		}	    
 	    return 0;
 	}
 
 	//executes select statements and returns the rows
 	function query($sql, $fetch = PDO::FETCH_OBJ) {
-		//$log = $GLOBALS["LOGGER"];
-		//$log->write("BaseDAO->query - Start: " . date("Y-m-d H:i:s")); 		
-		//$log->write("sql: $sql");
 		$result = null;
 		try {
 	    	$sth = $this->DB->prepare($sql);
 	    	$sth->execute();
 	    	$result = $sth->fetchAll($fetch);
 		} catch (Exception $e) {
-			objout($e);
-			objout($sth->errorInfo());
+			echo($e);
+			echo($sth->errorInfo());
 		}	    
 	    return $result;
-	}
-
-	function executeSQL($sql) {
-		return $this->query($sql);
 	}
 
 	function close() {
