@@ -171,8 +171,8 @@ class EmployeeDAO extends BaseDAO {
 				$this->memSet($dto->Key(), $dto);
 			}
 		} catch (Exception $e) {
-			objout($e);
-			objout($sth->errorInfo());
+			echo($e);
+			echo($sth->errorInfo());
 		}
 		return $dto;
 	}
@@ -211,8 +211,8 @@ class EmployeeDAO extends BaseDAO {
 				array_push($dtolist, $this->createDTO($row));
 			}
 		} catch (Exception $e) {
-			objout($e);
-			objout($sth->errorInfo());
+			echo($e);
+			echo($sth->errorInfo());
 		}
 		return $dtolist;
 	}
@@ -242,8 +242,8 @@ class EmployeeDAO extends BaseDAO {
 			$sth->bindParam(":ReportsTo", $dto->ReportsTo, PDO::PARAM_INT);	
 			$sth->execute(); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $this->DB->lastInsertId(); 
 	} 
@@ -252,7 +252,7 @@ class EmployeeDAO extends BaseDAO {
 	// usage: $recordsAffected = $dao->update($dto);
 	function updateDTO($dto) { 
 		dbgout("DAO->updateDTO "); 
-		objout($dto);
+		echo($dto);
 		try { 
 			$sth = $this->DB->prepare($this->SQL_UPDATE); 
 			$sth->bindParam(":EmployeeID", $dto->EmployeeID, PDO::PARAM_INT);	
@@ -276,8 +276,8 @@ class EmployeeDAO extends BaseDAO {
 			// caches record if memcached is enabled
 			$this->memSet($dto->Key(), $dto); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $sth->rowCount(); 
 	} 
@@ -292,8 +292,8 @@ class EmployeeDAO extends BaseDAO {
 			// removes from cache
 			$this->memDelete($dto->Key()); 			
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $sth->rowCount(); 
 	} 

@@ -146,7 +146,6 @@ if(strlen($tableName) > 0 && strlen($className) > 0) {
 	
 	// finder
 	$data .= "\tfunction findByPK(\$pk) {\n";
-	$data .= "\t\t//dbgout(\"DAO->findByPK \"); \n";	
 	$data .= "\t\ttry {\n";
 	$data .= "\t\t\t\$dto = \$this->memGet(new $dtoName(\$pk));\n";
 	$data .= "\t\t\tif(\$dto != null) return \$dto;\n";
@@ -159,14 +158,13 @@ if(strlen($tableName) > 0 && strlen($className) > 0) {
 	$data .= "\t\t\t\t\$this->memSet(\$dto->Key(), \$dto);\n";
 	$data .= "\t\t\t}\n";
 	$data .= "\t\t} catch (Exception \$e) {\n";
-	$data .= "\t\t\tobjout(\$e);\n";
-	$data .= "\t\t\tobjout(\$sth->errorInfo());\n";
+	$data .= "\t\t\techo(\$e);\n";
+	$data .= "\t\t\techo(\$sth->errorInfo());\n";
 	$data .= "\t\t}\n";		
 	$data .= "\t\treturn \$dto;\n";
 	$data .= "\t}\n";
 	// search
 	$data .= "\tfunction search(\$keyword = \"\", \$sort = \"\", \$limit = \"\") {\n";
-	$data .= "\t\t//dbgout(\"DAO->search \"); \n";
 	$data .= "\t\t\$dtolist = array();\n";
 	$data .= "\t\t\$sql = \$this->SQL_SELECT;\n";
 	$data .= "\t\t\$sql .= \"WHERE ( \";\n";
@@ -178,26 +176,23 @@ if(strlen($tableName) > 0 && strlen($className) > 0) {
 	$data .= "\";\n";
   $data .= "\t\t\$sql .= \")\";\n";
   $data .= "\t\t\$sql .= \$sort . \" \" . \$limit;\n";
-	$data .= "\t\t//dbgout(\$sql);\n";
 	$data .= "\t\ttry {\n";
 	$data .= "\t\t\t\$sth = \$this->DB->prepare(\$sql);\n";				
 	$data .= "\t\t\t\$keyword = \"%\" . \$keyword . \"%\";\n";
 	$data .= "\t\t\t\$sth->bindParam(':keyword', \$keyword, PDO::PARAM_STR);\n";		
-	$data .= "\t\t\t//objout(\$sth);\n";
 	$data .= "\t\t\t\$sth->execute();\n";
 	$data .= "\t\t\t\$result = \$sth->fetchAll(PDO::FETCH_OBJ);\n";
 	$data .= "\t\t\tforeach(\$result as \$row) {\n";
 	$data .= "\t\t\t\tarray_push(\$dtolist, \$this->createDTO(\$row));\n";
 	$data .= "\t\t\t}\n";
 	$data .= "\t\t} catch (Exception \$e) {\n";
-	$data .= "\t\t\tobjout(\$e);\n";
-	$data .= "\t\t\tobjout(\$sth->errorInfo());\n";
+	$data .= "\t\t\techo(\$e);\n";
+	$data .= "\t\t\techo(\$sth->errorInfo());\n";
 	$data .= "\t\t}\n";		
 	$data .= "\t\treturn \$dtolist;\n";
 	$data .= "\t}\n";
 	// insert
 	$data .= "\tfunction insertDTO(\$dto) { \n";
-	$data .= "\t\t//dbgout(\"DAO->insertDTO \"); \n";
 	$data .= "\t\ttry { \n";
 	$data .= "\t\t\t\$sth = \$this->DB->prepare(\$this->SQL_INSERT); \n";
 	foreach($props as $p) {
@@ -218,14 +213,13 @@ if(strlen($tableName) > 0 && strlen($className) > 0) {
 	}
 	$data .= "\t\t\t\$sth->execute(); \n";
 	$data .= "\t\t} catch (Exception \$e) { \n";
-	$data .= "\t\t\tobjout(\$e); \n";
-	$data .= "\t\t\tobjout(\$sth->errorInfo()); \n";
+	$data .= "\t\t\techo(\$e); \n";
+	$data .= "\t\t\techo(\$sth->errorInfo()); \n";
 	$data .= "\t\t}		 \n";
 	$data .= "\t\treturn \$this->DB->lastInsertId(); \n";
 	$data .= "\t} \n";
 	// update
 	$data .= "\tfunction updateDTO(\$dto) { \n";
-	$data .= "\t//dbgout(\"DAO->updateDTO \"); \n";
 	$data .= "\t\ttry { \n";
 	$data .= "\t\t\t\$sth = \$this->DB->prepare(\$this->SQL_UPDATE); \n";
 	foreach($props as $p) {
@@ -243,21 +237,20 @@ if(strlen($tableName) > 0 && strlen($className) > 0) {
 	$data .= "\t\t\t\$sth->execute(); \n";
 	$data .= "			\$this->memSet(\$dto->Key(), \$dto); \n";
 	$data .= "\t\t} catch (Exception \$e) { \n";
-	$data .= "\t\t\tobjout(\$e); \n";
-	$data .= "\t\t\tobjout(\$sth->errorInfo()); \n";
+	$data .= "\t\t\techo(\$e); \n";
+	$data .= "\t\t\techo(\$sth->errorInfo()); \n";
 	$data .= "\t\t}		 \n";
 	$data .= "\t\treturn \$sth->rowCount(); \n";
 	$data .= "\t} \n";
 	// delete
 	$data .= "	function deleteDTO(\$dto) { \n";
-	$data .= "		//dbgout(\"DAO->deleteDTO \"); \n";
 	$data .= "		try { \n";
 	$data .= "			\$sth = \$this->DB->prepare(\$this->SQL_DELETE); \n";
 	$data .= "			\$sth->bindParam(':$primaryKey', \$dto->$primaryKey, PDO::PARAM_INT);		 \n";
 	$data .= "			\$sth->execute(); \n";
 	$data .= "		} catch (Exception \$e) { \n";
-	$data .= "			objout(\$e); \n";
-	$data .= "			objout(\$sth->errorInfo()); \n";
+	$data .= "			echo(\$e); \n";
+	$data .= "			echo(\$sth->errorInfo()); \n";
 	$data .= "		}		 \n";
 	$data .= "		return \$sth->rowCount(); \n";
 	$data .= "	} \n";
@@ -265,7 +258,7 @@ if(strlen($tableName) > 0 && strlen($className) > 0) {
 	// -- end of DAO
 	$data .= "}\n";
 
-	objout($data);
+	echo($data);
 }
 ?>
 </body>

@@ -97,6 +97,7 @@ class SupplierDAO extends BaseDAO {
 	function SupplierDAO() {
 		$this->connect();
 	}
+
 	function createDTO($row) {
 		return new SupplierDTO(
 			$row->SupplierID,
@@ -113,8 +114,8 @@ class SupplierDAO extends BaseDAO {
 			$row->HomePage
 		);
 	}
+
 	function findByPK($pk) {
-		//dbgout("DAO->findByPK "); 
 		try {
 			$dto = $this->memGet(new SupplierDTO($pk));
 			if($dto != null) return $dto;
@@ -127,13 +128,13 @@ class SupplierDAO extends BaseDAO {
 				$this->memSet($dto->Key(), $dto);
 			}
 		} catch (Exception $e) {
-			objout($e);
-			objout($sth->errorInfo());
+			echo($e);
+			echo($sth->errorInfo());
 		}
 		return $dto;
 	}
+
 	function search($keyword = "", $sort = "", $limit = "") {
-		//dbgout("DAO->search "); 
 		$dtolist = array();
 		$sql = $this->SQL_SELECT;
 		$sql .= "WHERE ( ";
@@ -151,25 +152,22 @@ class SupplierDAO extends BaseDAO {
 		$sql .= "(HomePage LIKE :keyword) ";
 		$sql .= ")";
 		$sql .= $sort . " " . $limit;
-		//dbgout($sql);
 		try {
 			$sth = $this->DB->prepare($sql);
 			$keyword = "%" . $keyword . "%";
 			$sth->bindParam(':keyword', $keyword, PDO::PARAM_STR);
-			//objout($sth);
 			$sth->execute();
 			$result = $sth->fetchAll(PDO::FETCH_OBJ);
 			foreach($result as $row) {
 				array_push($dtolist, $this->createDTO($row));
 			}
 		} catch (Exception $e) {
-			objout($e);
-			objout($sth->errorInfo());
+			echo($e);
+			echo($sth->errorInfo());
 		}
 		return $dtolist;
 	}
 	function insertDTO($dto) { 
-		//dbgout("DAO->insertDTO "); 
 		try { 
 			$sth = $this->DB->prepare($this->SQL_INSERT); 
 			// SupplierID is auto_increment column
@@ -186,16 +184,16 @@ class SupplierDAO extends BaseDAO {
 			$sth->bindParam(":HomePage", $dto->HomePage);	
 			$sth->execute(); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $this->DB->lastInsertId(); 
 	} 
+
 	function updateDTO($dto) { 
-	//dbgout("DAO->updateDTO "); 
 		try { 
 			$sth = $this->DB->prepare($this->SQL_UPDATE); 
-			//$sth->bindParam(":SupplierID", $dto->SupplierID, PDO::PARAM_INT);	
+			$sth->bindParam(":SupplierID", $dto->SupplierID, PDO::PARAM_INT);	
 			$sth->bindParam(":CompanyName", $dto->CompanyName, PDO::PARAM_STR, 40);	 
 			$sth->bindParam(":ContactName", $dto->ContactName, PDO::PARAM_STR, 30);	 
 			$sth->bindParam(":ContactTitle", $dto->ContactTitle, PDO::PARAM_STR, 30);	 
@@ -210,20 +208,20 @@ class SupplierDAO extends BaseDAO {
 			$sth->execute(); 
 			$this->memSet($dto->Key(), $dto); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $sth->rowCount(); 
 	} 
+
 	function deleteDTO($dto) { 
-		//dbgout("DAO->deleteDTO "); 
 		try { 
 			$sth = $this->DB->prepare($this->SQL_DELETE); 
 			$sth->bindParam(':SupplierID', $dto->SupplierID, PDO::PARAM_INT);		 
 			$sth->execute(); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $sth->rowCount(); 
 	} 

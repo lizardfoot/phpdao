@@ -1,4 +1,16 @@
 <?
+/*
++-----------+------------------+------+-----+---------+----------------+
+| Field     | Type             | Null | Key | Default | Extra          |
++-----------+------------------+------+-----+---------+----------------+
+| odID      | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+| OrderID   | int(11)          | YES  |     | 0       |                |
+| ProductID | int(11)          | YES  |     | 0       |                |
+| UnitPrice | decimal(10,2)    | YES  |     | 0.00    |                |
+| Quantity  | smallint(6)      | YES  |     | 1       |                |
+| Discount  | float(1,0)       | YES  |     | 0       |                |
++-----------+------------------+------+-----+---------+----------------+
+*/
 require_once("BaseDAO.php");
 
 class OrderDetailDTO extends BaseDTO {
@@ -73,7 +85,6 @@ class OrderDetailDAO extends BaseDAO {
 	}
 
 	function findByPK($pk) {
-		//dbgout("DAO->findByPK "); 
 		try {
 			$dto = $this->memGet(new OrderDetailDTO($pk));
 			if($dto != null) return $dto;
@@ -86,14 +97,14 @@ class OrderDetailDAO extends BaseDAO {
 				$this->memSet($dto->Key(), $dto);
 			}
 		} catch (Exception $e) {
-			objout($e);
-			objout($sth->errorInfo());
+			echo($e);
+			echo($sth->errorInfo());
 		}
 		return $dto;
 	}
 
 	function search($keyword = "", $sort = "", $limit = "") {
-		//dbgout("DAO->search "); 
+
 		$dtolist = array();
 		$sql = $this->SQL_SELECT;
 		$sql .= "WHERE ( ";
@@ -104,49 +115,44 @@ class OrderDetailDAO extends BaseDAO {
 		//$sql .= "(Discount LIKE :keyword) ";
 		$sql .= ")";
 		$sql .= $sort . " " . $limit;
-		//dbgout($sql);
 		try {
 			$sth = $this->DB->prepare($sql);
 			$keyword = "%" . $keyword . "%";
 			$sth->bindParam(':keyword', $keyword, PDO::PARAM_STR);
-			//objout($sth);
+			//echo($sth);
 			$sth->execute();
 			$result = $sth->fetchAll(PDO::FETCH_OBJ);
 			foreach($result as $row) {
 				array_push($dtolist, $this->createDTO($row));
 			}
 		} catch (Exception $e) {
-			objout($e);
-			objout($sth->errorInfo());
+			echo($e);
+			echo($sth->errorInfo());
 		}
 		return $dtolist;
 	}
 
 	function searchByOrderId($orderID = "", $sort = "", $limit = "") {
-		//dbgout("DAO->search "); 
 		$dtolist = array();
 		$sql = $this->SQL_SELECT;
 		$sql .= "WHERE ( OrderID = $orderID ) ";
 		$sql .= $sort . " " . $limit;
-		//dbgout($sql);
 		try {
 			$sth = $this->DB->prepare($sql);
 			//$keyword = "%" . $keyword . "%";
 			//$sth->bindParam(':keyword', $keyword, PDO::PARAM_STR);
-			//objout($sth);
 			$sth->execute();
 			$result = $sth->fetchAll(PDO::FETCH_OBJ);
 			foreach($result as $row) {
 				array_push($dtolist, $this->createDTO($row));
 			}
 		} catch (Exception $e) {
-			objout($e);
-			objout($sth->errorInfo());
+			echo($e);
+			echo($sth->errorInfo());
 		}
 		return $dtolist;
 	}
 	function insertDTO($dto) { 
-		//dbgout("DAO->insertDTO "); 
 		try { 
 			$sth = $this->DB->prepare($this->SQL_INSERT); 
 			// odID is auto_increment column
@@ -157,13 +163,12 @@ class OrderDetailDAO extends BaseDAO {
 			$sth->bindParam(":Discount", $dto->Discount);	
 			$sth->execute(); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $this->DB->lastInsertId(); 
 	} 
 	function updateDTO($dto) { 
-	//dbgout("DAO->updateDTO "); 
 		try { 
 			$sth = $this->DB->prepare($this->SQL_UPDATE); 
 			$sth->bindParam(":odID", $dto->odID, PDO::PARAM_INT);	
@@ -175,20 +180,19 @@ class OrderDetailDAO extends BaseDAO {
 			$sth->execute(); 
 			$this->memSet($dto->Key(), $dto); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $sth->rowCount(); 
 	} 
 	function deleteDTO($dto) { 
-		//dbgout("DAO->deleteDTO "); 
 		try { 
 			$sth = $this->DB->prepare($this->SQL_DELETE); 
 			$sth->bindParam(':odID', $dto->odID, PDO::PARAM_INT);		 
 			$sth->execute(); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $sth->rowCount(); 
 	} 

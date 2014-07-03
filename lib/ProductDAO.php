@@ -97,7 +97,8 @@ class ProductDAO extends BaseDAO {
 	function ProductDAO() {
 		$this->connect();
 	}
-function createDTO($row) {
+
+	function createDTO($row) {
 		return new ProductDTO(
 			$row->ProductID,
 			$row->ProductName,
@@ -113,8 +114,8 @@ function createDTO($row) {
 			$row->Discontinued
 		);
 	}
+
 	function findByPK($pk) {
-		//dbgout("DAO->findByPK "); 
 		try {
 			$dto = $this->memGet(new ProductDTO($pk));
 			if($dto != null) return $dto;
@@ -127,13 +128,13 @@ function createDTO($row) {
 				$this->memSet($dto->Key(), $dto);
 			}
 		} catch (Exception $e) {
-			objout($e);
-			objout($sth->errorInfo());
+			echo($e);
+			echo($sth->errorInfo());
 		}
 		return $dto;
 	}
+
 	function search($keyword = "", $sort = "", $limit = "") {
-		//dbgout("DAO->search "); 
 		$dtolist = array();
 		$sql = $this->SQL_SELECT;
 		$sql .= "WHERE ( ";
@@ -149,25 +150,23 @@ function createDTO($row) {
 		$sql .= "(Discontinued LIKE :keyword) ";
 		$sql .= ")";
 		$sql .= $sort . " " . $limit;
-		//dbgout($sql);
 		try {
 			$sth = $this->DB->prepare($sql);
 			$keyword = "%" . $keyword . "%";
 			$sth->bindParam(':keyword', $keyword, PDO::PARAM_STR);
-			//objout($sth);
 			$sth->execute();
 			$result = $sth->fetchAll(PDO::FETCH_OBJ);
 			foreach($result as $row) {
 				array_push($dtolist, $this->createDTO($row));
 			}
 		} catch (Exception $e) {
-			objout($e);
-			objout($sth->errorInfo());
+			echo($e);
+			echo($sth->errorInfo());
 		}
 		return $dtolist;
 	}
+
 	function insertDTO($dto) { 
-		//dbgout("DAO->insertDTO "); 
 		try { 
 			$sth = $this->DB->prepare($this->SQL_INSERT); 
 			// ProductID is auto_increment column
@@ -182,13 +181,13 @@ function createDTO($row) {
 			$sth->bindParam(":Discontinued", $dto->Discontinued);	
 			$sth->execute(); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $this->DB->lastInsertId(); 
 	} 
+
 	function updateDTO($dto) { 
-	//dbgout("DAO->updateDTO "); 
 		try { 
 			$sth = $this->DB->prepare($this->SQL_UPDATE); 
 			$sth->bindParam(":ProductID", $dto->ProductID, PDO::PARAM_INT);	
@@ -204,20 +203,20 @@ function createDTO($row) {
 			$sth->execute(); 
 			$this->memSet($dto->Key(), $dto); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $sth->rowCount(); 
 	} 
+
 	function deleteDTO($dto) { 
-		//dbgout("DAO->deleteDTO "); 
 		try { 
 			$sth = $this->DB->prepare($this->SQL_DELETE); 
 			$sth->bindParam(':ProductID', $dto->ProductID, PDO::PARAM_INT);		 
 			$sth->execute(); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $sth->rowCount(); 
 	} 

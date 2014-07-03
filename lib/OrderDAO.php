@@ -126,6 +126,7 @@ class OrderDAO extends BaseDAO {
 		$this->connect();
 	}
 
+	// creates a DTO from a DB result
 	function createDTO($row) {
 		return new OrderDTO(
 			$row->OrderID,
@@ -148,8 +149,9 @@ class OrderDAO extends BaseDAO {
 		);
 	}
 
+	// returns one DTO based on primary key; null if not found
+	// usage: $dto = $dao->findByPK(2);
 	function findByPK($pk) {
-		//dbgout("DAO->findByPK "); 
 		try {
 			$dto = $this->memGet(new OrderDTO($pk));
 			if($dto != null) return $dto;
@@ -162,17 +164,18 @@ class OrderDAO extends BaseDAO {
 				$this->memSet($dto->Key(), $dto);
 			}
 		} catch (Exception $e) {
-			objout($e);
-			objout($sth->errorInfo());
+			echo($e);
+			echo($sth->errorInfo());
 		}
 		return $dto;
 	}
+
+	// returns an array of DTOs 
+	// usage: $dtolist = $dao->search("Wellington", "order by 1", "limit 25");
 	function search($keyword = "", $sort = "", $limit = "") {
-		//dbgout("DAO->search "); 
 		$dtolist = array();
 		$sql = $this->SQL_SELECT;
 		$sql .= "WHERE ( ";
-		//$sql .= "(OrderID LIKE :keyword) OR";
 		$sql .= "(CustomerName LIKE :keyword) OR";
 		$sql .= "(EmployeeName LIKE :keyword) OR";
 		$sql .= "(OrderDate LIKE :keyword) OR";
@@ -188,25 +191,25 @@ class OrderDAO extends BaseDAO {
 		$sql .= "(ShipCountry LIKE :keyword) ";
 		$sql .= ")";
 		$sql .= $sort . " " . $limit;
-		//dbgout($sql);
 		try {
 			$sth = $this->DB->prepare($sql);
 			$keyword = "%" . $keyword . "%";
 			$sth->bindParam(':keyword', $keyword, PDO::PARAM_STR);
-			//objout($sth);
 			$sth->execute();
 			$result = $sth->fetchAll(PDO::FETCH_OBJ);
 			foreach($result as $row) {
 				array_push($dtolist, $this->createDTO($row));
 			}
 		} catch (Exception $e) {
-			objout($e);
-			objout($sth->errorInfo());
+			echo($e);
+			echo($sth->errorInfo());
 		}
 		return $dtolist;
 	}
+
+	// inserts a new record and returns last insert id
+	// usage: $OrderID = $dao->insert($dto);
 	function insertDTO($dto) { 
-		//dbgout("DAO->insertDTO "); 
 		try { 
 			$sth = $this->DB->prepare($this->SQL_INSERT); 
 			// OrderID is auto_increment column
@@ -225,13 +228,15 @@ class OrderDAO extends BaseDAO {
 			$sth->bindParam(":ShipCountry", $dto->ShipCountry, PDO::PARAM_STR, 15);	 
 			$sth->execute(); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $this->DB->lastInsertId(); 
 	} 
+
+	// updates a row in the db, returns number of rows updated
+	// usage: $recordsAffected = $dao->update($dto);
 	function updateDTO($dto) { 
-	//dbgout("DAO->updateDTO "); 
 		try { 
 			$sth = $this->DB->prepare($this->SQL_UPDATE); 
 			$sth->bindParam(":OrderID", $dto->OrderID, PDO::PARAM_INT);	
@@ -251,20 +256,22 @@ class OrderDAO extends BaseDAO {
 			$sth->execute(); 
 			$this->memSet($dto->Key(), $dto); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $sth->rowCount(); 
 	} 
+
+	// delete a row in the db, returns number of rows deleted
+	// usage: $recordsDeleted = $dao->delete($dto);
 	function deleteDTO($dto) { 
-		//dbgout("DAO->deleteDTO "); 
 		try { 
 			$sth = $this->DB->prepare($this->SQL_DELETE); 
 			$sth->bindParam(':OrderID', $dto->OrderID, PDO::PARAM_INT);		 
 			$sth->execute(); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $sth->rowCount(); 
 	} 

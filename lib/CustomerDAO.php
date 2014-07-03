@@ -125,8 +125,8 @@ class CustomerDAO extends BaseDAO {
 				$this->memSet($dto->Key(), $dto);
 			}
 		} catch (Exception $e) {
-			objout($e);
-			objout($sth->errorInfo());
+			echo($e);
+			echo($sth->errorInfo());
 		}
 		return $dto;
 	}
@@ -160,8 +160,8 @@ class CustomerDAO extends BaseDAO {
 				array_push($dtolist, $this->createDTO($row));
 			}
 		} catch (Exception $e) {
-			objout($e);
-			objout($sth->errorInfo());
+			echo($e);
+			echo($sth->errorInfo());
 		}
 		return $dtolist;
 	}
@@ -184,8 +184,8 @@ class CustomerDAO extends BaseDAO {
 			$sth->bindParam(":Fax", $dto->Fax, PDO::PARAM_STR, 24);	 
 			$sth->execute(); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $this->DB->lastInsertId(); 
 	} 
@@ -211,8 +211,8 @@ class CustomerDAO extends BaseDAO {
 			// caches record if memcached is enabled
 			$this->memSet($dto->Key(), $dto); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $sth->rowCount(); 
 	} 
@@ -227,8 +227,8 @@ class CustomerDAO extends BaseDAO {
 			// removes from cache
 			$this->memDelete($dto->Key()); 
 		} catch (Exception $e) { 
-			objout($e); 
-			objout($sth->errorInfo()); 
+			echo($e); 
+			echo($sth->errorInfo()); 
 		}		 
 		return $sth->rowCount(); 
 	} 
