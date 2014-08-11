@@ -157,6 +157,7 @@ class EmployeeDAO extends BaseDAO {
 	// returns one DTO based on primary key; null if not found
 	// usage: $dto = $dao->findByPK(2);
 	function findByPK($pk) {
+		$dto = null;
 		try {
 			// tries to find the record in the cache if enabled
 			$dto = $this->memGet(new EmployeeDTO($pk));
