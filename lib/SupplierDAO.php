@@ -116,6 +116,7 @@ class SupplierDAO extends BaseDAO {
 	}
 
 	function findByPK($pk) {
+		$dto = null;
 		try {
 			$dto = $this->memGet(new SupplierDTO($pk));
 			if($dto != null) return $dto;

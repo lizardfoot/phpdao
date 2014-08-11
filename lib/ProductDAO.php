@@ -116,6 +116,7 @@ class ProductDAO extends BaseDAO {
 	}
 
 	function findByPK($pk) {
+		$dto = null;
 		try {
 			$dto = $this->memGet(new ProductDTO($pk));
 			if($dto != null) return $dto;

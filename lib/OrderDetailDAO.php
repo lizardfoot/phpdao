@@ -85,6 +85,7 @@ class OrderDetailDAO extends BaseDAO {
 	}
 
 	function findByPK($pk) {
+		$dto = null;
 		try {
 			$dto = $this->memGet(new OrderDetailDTO($pk));
 			if($dto != null) return $dto;

@@ -152,6 +152,7 @@ class OrderDAO extends BaseDAO {
 	// returns one DTO based on primary key; null if not found
 	// usage: $dto = $dao->findByPK(2);
 	function findByPK($pk) {
+		$dto = null;
 		try {
 			$dto = $this->memGet(new OrderDTO($pk));
 			if($dto != null) return $dto;
